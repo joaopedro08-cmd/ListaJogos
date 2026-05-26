@@ -1,0 +1,234 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #f4f4f4;
+    color: #222;
+}
+
+/* HEADER */
+
+header {
+    background-color: white;
+
+    padding: 20px 40px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+
+    color: #333;
+}
+
+nav {
+    display: flex;
+    gap: 20px;
+}
+
+nav a {
+    text-decoration: none;
+
+    color: #555;
+
+    transition: 0.3s;
+}
+
+nav a:hover {
+    color: black;
+}
+
+/* PESQUISA */
+
+.search-box input {
+    width: 220px;
+
+    padding: 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    outline: none;
+}
+
+/* BANNER */
+
+.banner {
+    width: 100%;
+    height: 320px;
+
+    background-image: url("https://www.pcworld.com/wp-content/uploads/2025/04/steam-game-library-1.jpg?quality=50&strip=all&w=1024");
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.banner h1 {
+    background-color: rgba(255,255,255,0.8);
+
+    padding: 20px 30px;
+
+    border-radius: 10px;
+
+    color: #222;
+}
+
+/* TITULO */
+
+.section-title {
+    margin: 40px;
+
+    font-size: 30px;
+
+    color: #333;
+}
+
+/* GRID */
+
+.games-container {
+    padding: 0 40px 40px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+    gap: 25px;
+}
+
+/* CARD */
+
+.game-card {
+    background-color: white;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    transition: 0.3s;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+}
+
+.game-card img {
+    width: 100%;
+    height: 180px;
+
+    object-fit: cover;
+}
+
+/* INFO */
+
+.game-info {
+    padding: 20px;
+}
+
+.game-info h2 {
+    margin-bottom: 10px;
+}
+
+.game-info p {
+    color: #666;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    margin-bottom: 15px;
+}
+
+/* TAGS */
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+.tags span {
+    background-color: #e8e8e8;
+
+    padding: 6px 12px;
+
+    border-radius: 5px;
+
+    font-size: 12px;
+
+    color: #444;
+}
+
+/* BOTÃO */
+
+.play-btn {
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #333;
+    color: white;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.play-btn:hover {
+    background-color: black;
+}
+
+/* FOOTER */
+
+footer {
+    background-color: white;
+
+    padding: 30px;
+
+    text-align: center;
+
+    border-top: 1px solid #ddd;
+
+    color: #666;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 768px) {
+
+    header {
+        flex-direction: column;
+
+        gap: 20px;
+    }
+
+    .banner h1 {
+        font-size: 28px;
+
+        text-align: center;
+    }
+
+    .search-box input {
+        width: 100%;
+    }
+}
