@@ -1,143 +1,235 @@
 /* =========================================
-   PESQUISA DE JOGOS
+   UTILS
 ========================================= */
 
 const searchInput = document.querySelector(".search-box input");
-const gameCards = document.querySelectorAll(".game-card");
+const categoriesPanel = document.querySelector('.categories-panel');
+const addGameSection = document.querySelector('#add-game-section');
+const addGameForm = document.querySelector('#add-game-form');
+const gamesContainer = document.querySelector('.games-container');
+const STORAGE_KEY = 'syncGamesAdded';
+
+function getSavedGames() {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+        console.warn('Erro ao ler jogos salvos:', error);
+        return [];
+    }
+}
+
+function saveGames(games) {
+    if (typeof localStorage === 'undefined') return;
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+    } catch (error) {
+        console.warn('Erro ao salvar jogos:', error);
+    }
+}
+
+function addGameToStorage(gameData) {
+    const saved = getSavedGames();
+    saved.push(gameData);
+    saveGames(saved);
+}
+
+function loadSavedGames() {
+    const savedGames = getSavedGames();
+    savedGames.forEach(game => addGameCard(game, false));
+}
+
+function getGameCards() {
+    return document.querySelectorAll('.game-card');
+}
+
+function filterGamesByText(value) {
+    getGameCards().forEach(card => {
+        const titleEl = card.querySelector('h2');
+        const title = titleEl ? titleEl.textContent.toLowerCase() : '';
+        card.style.display = title.includes(value) ? 'block' : 'none';
+    });
+}
+
+function resetFilters() {
+    if (searchInput) searchInput.value = '';
+    filterGamesByText('');
+}
+
+function setupTagFilter(context = document) {
+    const tags = context.querySelectorAll('.tags span');
+    tags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            const selectedTag = (tag.textContent || '').toLowerCase();
+            getGameCards().forEach(card => {
+                const tagsEl = card.querySelector('.tags');
+                const cardTags = tagsEl ? tagsEl.textContent.toLowerCase() : '';
+                card.style.display = cardTags.includes(selectedTag) ? 'block' : 'none';
+            });
+        });
+    });
+}
+
+function buildCategoriesPanel() {
+    if (!categoriesPanel) return;
+    categoriesPanel.innerHTML = '';
+    categoriesPanel.style.display = 'flex';
+    categoriesPanel.style.padding = '10px 20px';
+    categoriesPanel.style.background = '#fff';
+    categoriesPanel.style.borderBottom = '1px solid #ddd';
+    categoriesPanel.style.gap = '10px';
+    categoriesPanel.style.flexWrap = 'wrap';
+
+    const uniqueTags = new Set();
+    document.querySelectorAll('.tags span').forEach(t => uniqueTags.add((t.textContent || '').trim()));
+
+    const btnAll = document.createElement('button');
+    btnAll.textContent = 'Todos';
+    btnAll.className = 'category-btn';
+    btnAll.addEventListener('click', resetFilters);
+    categoriesPanel.appendChild(btnAll);
+
+    uniqueTags.forEach(tagName => {
+        const b = document.createElement('button');
+        b.textContent = tagName;
+        b.className = 'category-btn';
+        b.addEventListener('click', () => {
+            getGameCards().forEach(card => {
+                const tagsEl = card.querySelector('.tags');
+                const cardTags = tagsEl ? tagsEl.textContent.toLowerCase() : '';
+                card.style.display = cardTags.includes(tagName.toLowerCase()) ? 'block' : 'none';
+            });
+        });
+        categoriesPanel.appendChild(b);
+    });
+}
+
+function hideAddGameSection() {
+    if (addGameSection) addGameSection.style.display = 'none';
+}
+
+function showAddGameSection() {
+    if (addGameSection) {
+        if (categoriesPanel) categoriesPanel.style.display = 'none';
+        addGameSection.style.display = 'block';
+        addGameSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function toggleCategoriesPanel() {
+    if (!categoriesPanel) return;
+    hideAddGameSection();
+    if (categoriesPanel.style.display === 'flex') {
+        categoriesPanel.style.display = 'none';
+        return;
+    }
+    buildCategoriesPanel();
+}
+
+function createGameCard(data) {
+    const card = document.createElement('div');
+    card.className = 'game-card';
+
+    const img = document.createElement('img');
+    img.src = data.imageUrl;
+    img.alt = data.name;
+    card.appendChild(img);
+
+    const info = document.createElement('div');
+    info.className = 'game-info';
+
+    const title = document.createElement('h2');
+    title.textContent = data.name;
+    info.appendChild(title);
+
+    const description = document.createElement('p');
+    description.textContent = data.description;
+    info.appendChild(description);
+
+    const tagsContainer = document.createElement('div');
+    tagsContainer.className = 'tags';
+    data.categories.forEach(tagText => {
+        const span = document.createElement('span');
+        span.textContent = tagText;
+        tagsContainer.appendChild(span);
+    });
+    info.appendChild(tagsContainer);
+
+    card.appendChild(info);
+    return card;
+}
+
+function addGameCard(gameData, save = false) {
+    const newCard = createGameCard(gameData);
+    gamesContainer.appendChild(newCard);
+    setupTagFilter(newCard);
+    if (save) {
+        addGameToStorage(gameData);
+    }
+    if (categoriesPanel && categoriesPanel.style.display === 'flex') {
+        buildCategoriesPanel();
+    }
+}
+
+function parseTags(value) {
+    return value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+}
+
+/* =========================================
+   INICIALIZAÇÃO
+========================================= */
 
 if (searchInput) {
-    searchInput.addEventListener("input", () => {
+    searchInput.addEventListener('input', () => {
+        filterGamesByText((searchInput.value || '').toLowerCase());
+    });
+}
 
-        const value = (searchInput.value || "").toLowerCase();
+if (addGameForm) {
+    addGameForm.addEventListener('submit', (event) => {
+        event.preventDefault();
 
-        if (gameCards && gameCards.length) {
-            gameCards.forEach(card => {
+        const nameInput = document.querySelector('#game-name');
+        const imageInput = document.querySelector('#game-image');
+        const categoriesInput = document.querySelector('#game-categories');
+        const descriptionInput = document.querySelector('#game-description');
 
-                const titleEl = card.querySelector("h2");
-                const title = titleEl ? titleEl.textContent.toLowerCase() : "";
+        if (!nameInput || !imageInput || !categoriesInput || !descriptionInput) return;
 
-                if (title.includes(value)) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
+        const name = nameInput.value.trim();
+        const imageUrl = imageInput.value.trim();
+        const categories = parseTags(categoriesInput.value);
+        const description = descriptionInput.value.trim();
 
-            });
+        if (!name || !imageUrl || !description || categories.length === 0) {
+            alert('Por favor, preencha todos os campos e adicione pelo menos uma categoria.');
+            return;
         }
 
+        addGameCard({ name, imageUrl, description, categories }, true);
+
+        nameInput.value = '';
+        imageInput.value = '';
+        categoriesInput.value = '';
+        descriptionInput.value = '';
+
+        alert('Jogo adicionado com sucesso!');
     });
 }
 
+setupTagFilter();
+loadSavedGames();
 
-/* =========================================
-   BOTÃO JOGAR
-========================================= */
-
-const playButtons = document.querySelectorAll(".play-btn");
-
-if (playButtons && playButtons.length) {
-    playButtons.forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            const parent = button.closest('.game-info') || button.parentElement;
-            const titleEl = parent ? parent.querySelector("h2") : null;
-            const gameName = titleEl ? titleEl.textContent : "este jogo";
-
-            alert("Abrindo " + gameName);
-
-        });
-
-    });
-}
-
-
-/* =========================================
-   EFEITO HOVER SUAVE
-========================================= */
-
-if (gameCards && gameCards.length) {
-    gameCards.forEach(card => {
-
-        card.addEventListener("mouseenter", () => {
-
-            card.style.transition = "0.3s";
-
-        });
-
-    });
-}
-
-
-/* =========================================
-   FILTRO POR TAGS
-========================================= */
-
-const tags = document.querySelectorAll(".tags span");
-
-if (tags && tags.length && gameCards && gameCards.length) {
-    tags.forEach(tag => {
-
-        tag.addEventListener("click", () => {
-
-            const selectedTag = (tag.textContent || "").toLowerCase();
-
-            gameCards.forEach(card => {
-
-                const tagsEl = card.querySelector(".tags");
-                const cardTags = tagsEl ? tagsEl.textContent.toLowerCase() : "";
-
-                if (cardTags.includes(selectedTag)) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
-
-            });
-
-        });
-
-    });
-}
-
-
-/* =========================================
-   DUPLO CLIQUE PARA RESETAR FILTRO
-========================================= */
-
-const sectionTitle = document.querySelector(".section-title");
-if (sectionTitle) {
-    sectionTitle.addEventListener("dblclick", () => {
-
-        if (gameCards && gameCards.length) {
-            gameCards.forEach(card => {
-                card.style.display = "block";
-            });
-        }
-
-        if (searchInput) searchInput.value = "";
-
-    });
-}
-
-
-/* =========================================
-   MENSAGEM DE BOAS-VINDAS
-========================================= */
-
-window.addEventListener("load", () => {
-
-    console.log("Biblioteca carregada com sucesso!");
-
+window.addEventListener('load', () => {
+    console.log('Biblioteca carregada com sucesso!');
 });
-
 
 /* =========================================
    NAVEGAÇÃO DO HEADER
 ========================================= */
 
 const navLinks = document.querySelectorAll('nav a[data-action]');
-const categoriesPanel = document.querySelector('.categories-panel');
 
 if (navLinks && navLinks.length) {
     navLinks.forEach(link => {
@@ -152,6 +244,7 @@ if (navLinks && navLinks.length) {
             }
 
             if (action === 'games') {
+                hideAddGameSection();
                 const games = document.querySelector('.games-container');
                 if (games) games.scrollIntoView({ behavior: 'smooth' });
             }
@@ -160,62 +253,18 @@ if (navLinks && navLinks.length) {
                 toggleCategoriesPanel();
             }
 
+            if (action === 'add') {
+                showAddGameSection();
+            }
+
             if (action === 'contact') {
+                hideAddGameSection();
                 const footer = document.querySelector('footer');
                 if (footer) footer.scrollIntoView({ behavior: 'smooth' });
                 setTimeout(() => {
                     alert('Para entrar em contato, envie um e-mail para contato@gamelibrary.com');
                 }, 600);
             }
-
         });
     });
-}
-
-function toggleCategoriesPanel() {
-    if (!categoriesPanel) return;
-
-    if (categoriesPanel.innerHTML.trim()) {
-        categoriesPanel.style.display = categoriesPanel.style.display === 'none' ? 'flex' : 'none';
-        return;
-    }
-
-    // Estiliza o painel rapidamente
-    categoriesPanel.style.display = 'flex';
-    categoriesPanel.style.padding = '10px 20px';
-    categoriesPanel.style.background = '#fff';
-    categoriesPanel.style.borderBottom = '1px solid #ddd';
-    categoriesPanel.style.gap = '10px';
-    categoriesPanel.style.flexWrap = 'wrap';
-
-    const uniqueTags = new Set();
-    const allTagEls = document.querySelectorAll('.tags span');
-    allTagEls.forEach(t => uniqueTags.add((t.textContent || '').trim()));
-
-    const btnAll = document.createElement('button');
-    btnAll.textContent = 'Todos';
-    btnAll.className = 'category-btn';
-    btnAll.addEventListener('click', () => {
-        if (gameCards && gameCards.length) gameCards.forEach(c => c.style.display = 'block');
-        if (searchInput) searchInput.value = '';
-    });
-    categoriesPanel.appendChild(btnAll);
-
-    uniqueTags.forEach(tagName => {
-        const b = document.createElement('button');
-        b.textContent = tagName;
-        b.className = 'category-btn';
-        b.addEventListener('click', () => {
-            if (gameCards && gameCards.length) {
-                gameCards.forEach(card => {
-                    const tagsEl = card.querySelector('.tags');
-                    const cardTags = tagsEl ? tagsEl.textContent.toLowerCase() : '';
-                    if (cardTags.includes(tagName.toLowerCase())) card.style.display = 'block';
-                    else card.style.display = 'none';
-                });
-            }
-        });
-        categoriesPanel.appendChild(b);
-    });
-
 }
