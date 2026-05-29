@@ -15,21 +15,28 @@
     <nav>
         <a href="#" data-action="home">Início</a>
         <a href="#" data-action="games">Jogos</a>
-        <a href="#" data-action="categories">Categorias</a>
         <a href="#" data-action="add">Adicionar</a>
+        <a href="#" data-action="manage">Gerenciar</a>
         <a href="#" data-action="contact">Contato</a>
     </nav>
 
     <div class="search-box">
         <input type="text" placeholder="Pesquisar jogos...">
     </div>
+    <button id="theme-toggle" class="theme-toggle-btn" type="button">Tema escuro</button>
 </header>
 
-<div class="categories-panel" style="display:none;"></div>
-
 <section class="banner">
-    <h1>SYNC</h1>
+    <h1>Sync Games</h1>
 </section>
+
+<div class="categories-panel"></div>
+
+<div class="games-toolbar">
+    <button id="category-toggle" class="filter-toggle-btn" type="button" aria-label="Filtrar jogos">
+        <span class="filter-icon"></span>
+    </button>
+</div>
 
 <section id="add-game-section" class="add-game-section" style="display:none;">
     <h2>Adicionar Novo Jogo</h2>
@@ -37,139 +44,46 @@
         <input type="text" id="game-name" placeholder="Nome do jogo" required>
         <input type="url" id="game-image" placeholder="URL da imagem do jogo" required>
         <input type="text" id="game-categories" placeholder="Categorias (separadas por vírgula)" required>
+        <input type="date" id="game-release-date" placeholder="Data de lançamento" required>
+        <input type="number" id="game-price" placeholder="Preço médio (R$)" step="0.01" min="0" required>
         <textarea id="game-description" placeholder="Descrição do jogo" required></textarea>
+        <textarea id="game-min-req" placeholder="Requisitos mínimos (cada item em nova linha)"></textarea>
+        <textarea id="game-rec-req" placeholder="Requisitos recomendados (cada item em nova linha)"></textarea>
         <button type="submit">Adicionar jogo</button>
     </form>
 </section>
 
-<h2 class="section-title">Jogos em Destaque</h2>
+<section id="manage-games-section" class="manage-games-section" style="display:none;">
+    <h2>Gerenciar seus jogos</h2>
+    <p class="manage-info">Edite ou remova os jogos que você adicionou. As alterações também ficam salvas no seu navegador.</p>
+    <div id="manage-games-list" class="manage-list"></div>
 
-<section class="games-container">
-
-    <div class="game-card">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPjJIuIq54wcW2n1UyrqXj8r_B35R6bzOB-A&s" alt="Resident Evil">
-
-        <div class="game-info">
-            <h2>Resident Evil 4</h2>
-
-            <p>
-                Leon Kennedy é enviado para resgatar a filha do presidente em uma vila dominada por uma ameaça sombria.
-                Entre criaturas perigosas e ação intensa, ele luta para sobreviver e descobrir a verdade.
-            </p>
-
-            <div class="tags">
-                <span>Ação</span>
-                <span>Terror</span>
-                <span>Sobrevivência</span>
-            </div>
-
+    <form id="edit-game-form" class="edit-game-form" style="display:none;">
+        <h3>Editar jogo</h3>
+        <input type="text" id="edit-game-name" placeholder="Nome do jogo" required>
+        <input type="url" id="edit-game-image" placeholder="URL da imagem do jogo" required>
+        <input type="text" id="edit-game-categories" placeholder="Categorias (separadas por vírgula)" required>
+        <input type="date" id="edit-game-release-date" placeholder="Data de lançamento" required>
+        <input type="number" id="edit-game-price" placeholder="Preço médio (R$)" step="0.01" min="0" required>
+        <textarea id="edit-game-description" placeholder="Descrição do jogo" required></textarea>
+        <textarea id="edit-game-min-req" placeholder="Requisitos mínimos (cada item em nova linha)"></textarea>
+        <textarea id="edit-game-rec-req" placeholder="Requisitos recomendados (cada item em nova linha)"></textarea>
+        <div class="manage-buttons">
+            <button type="submit">Salvar alterações</button>
+            <button type="button" id="cancel-edit" class="cancel-btn">Cancelar</button>
         </div>
-    </div>
-
-    <div class="game-card">
-        <img src="https://preview.redd.it/what-is-the-java-edition-seed-for-minecrafts-cover-art-v0-alwc1nswqdw51.png?width=767&format=png&auto=webp&s=4d67aab7260383ca7b48bc5d5e8a0916dccdc2b3" alt="Minecraft">
-
-        <div class="game-info">
-            <h2>Minecraft</h2>
-
-            <p>
-                Os jogadores exploram um mundo aberto feito de blocos, podendo construir, minerar e sobreviver.
-                O jogo mistura criatividade, aventura e exploração em diferentes modos de jogo.
-            </p>
-
-            <div class="tags">
-                <span>Sandbox</span>
-                <span>Construção</span>
-                <span>Online</span>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="game-card">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi1Ss8JrF6wtsT3jr3U-TM--1hOujG7LC9Eg&s" alt="Valorant">
-
-        <div class="game-info">
-            <h2>Valorant</h2>
-
-            <p>
-                Equipes de agentes com habilidades únicas se enfrentam em partidas táticas de tiro 5v5.
-                O jogo combina estratégia, precisão e poderes especiais em combates competitivos intensos.
-            </p>
-
-            <div class="tags">
-                <span>FPS</span>
-                <span>Competitivo</span>
-                <span>Online</span>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="game-card">
-        <img src="https://midias.em.com.br/_midias/jpg/2024/10/04/520x405/1_silent_hill_2_remake-40442944.jpg?20241004175310?20241004175310" alt="Silent Hill 2">
-
-        <div class="game-info">
-            <h2>Silent Hill 2</h2>
-
-            <p>
-                James retorna à cidade de Silent Hill após receber uma carta de sua esposa falecida.
-                Entre monstros e mistérios, ele enfrenta seus próprios traumas psicológicos.
-            </p>
-
-            <div class="tags">
-                <span>Survival Horror</span>
-                <span>Terror</span>
-                <span>Suspense</span>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="game-card">
-        <img src="https://tm.ibxk.com.br/2022/02/16/16171456629489.jpg" alt="Dead by Daylight">
-
-        <div class="game-info">
-            <h2>Dead by Daylight</h2>
-
-            <p>
-                Quatro sobreviventes tentam escapar de um assassino implacável em partidas de terror multiplayer.
-                Cada jogo mistura estratégia, perseguição e sobrevivência em cenários sombrios.
-            </p>
-
-            <div class="tags">
-                <span>Terror</span>
-                <span>Multiplayer</span>
-                <span>Sobrevivência</span>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="game-card">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfyM2nYwjWN4X2alFe97ikNPYMuVPLX6Y07g&s" alt="Resident Evil Requiem">
-
-        <div class="game-info">
-            <h2>Resident Evil Requiem</h2>
-
-            <p>
-                Uma nova ameaça biológica coloca sobreviventes diante de horrores e conspirações mortais.
-                Em meio ao caos, eles precisam lutar para descobrir a verdade e sobreviver.
-            </p>
-
-            <div class="tags">
-                <span>Survival Horror</span>
-                <span>Terror</span>
-                <span>Ação</span>
-            </div>
-
-        </div>
-    </div>
-
+    </form>
 </section>
 
+<section id="game-detail-section" class="game-detail-section" style="display:none;">
+    <button id="back-to-games" class="back-btn">← Voltar</button>
+    <div id="detail-content" class="detail-content"></div>
+</section>
+
+<section class="games-container"></section>
+
 <footer>
-    <p>© 2026 GameLibrary - Todos os direitos reservados</p>
+    <p>© 2026 Sync - Todos os direitos reservados</p>
 </footer>
 
 <script src="js/lista.js"></script>
