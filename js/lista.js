@@ -16,16 +16,16 @@ const addGameForm = document.querySelector('#add-game-form');
 const themeToggleButton = document.querySelector('#theme-toggle');
 const categoryToggleButton = document.querySelector('#category-toggle');
 const STORAGE_KEY = 'syncGamesAdded';
+const defaultGamesGrid = document.querySelector('#default-games-grid');
 
 const defaultGames = [
     {
         id: 'resident-evil-4',
         name: 'Resident Evil 4',
-        imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPjJIuIq54wcW2n1UyrqXj8r_B35R6bzOB-A&s',
+        imageUrl: 'https://media.senscritique.com/media/000021509526/0/resident_evil_4.png',
         gallery: [
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPjJIuIq54wcW2n1UyrqXj8r_B35R6bzOB-A&s',
-            'https://assets-prd.ignimgs.com/2023/03/22/resident-evil-4-header-1679522230670.jpg',
-            'https://cdn1.epicgames.com/offer/57d4d52218f7420eba0c667f64c86ff2/EGS_RESIDENTEVIL4_CAPCOMCo.Ltd_S4-1200x1600-868e3716d1d70e42b6a2659de8b3ab99.jpg'
+            'https://assets-prd.ignimgs.com/2023/03/22/resident-evil-4-header-1679522230670.jpg'
         ],
         description: 'Leon Kennedy é enviado para resgatar a filha do presidente em uma vila dominada por uma ameaça sombria. Entre criaturas perigosas e ação intensa, ele luta para sobreviver e descobrir a verdade.',
         categories: ['Ação', 'Terror', 'Sobrevivência'],
@@ -37,9 +37,7 @@ const defaultGames = [
         name: 'Minecraft',
         imageUrl: 'https://preview.redd.it/what-is-the-java-edition-seed-for-minecrafts-cover-art-v0-alwc1nswqdw51.png?width=767&format=png&auto=webp&s=4d67aab7260383ca7b48bc5d5e8a0916dccdc2b3',
         gallery: [
-            'https://preview.redd.it/what-is-the-java-edition-seed-for-minecrafts-cover-art-v0-alwc1nswqdw51.png?width=767&format=png&auto=webp&s=4d67aab7260383ca7b48bc5d5e8a0916dccdc2b3',
-            'https://cdn.mos.cms.futurecdn.net/erGSNPGCPhR7MTRmHtVmED.jpg',
-            'https://media.contentapi.ea.com/content/dam/gin/images/2023/05/2023-minecraft-java-edition-hero-image-4k.jpg'
+            'https://preview.redd.it/what-is-the-java-edition-seed-for-minecrafts-cover-art-v0-alwc1nswqdw51.png?width=767&format=png&auto=webp&s=4d67aab7260383ca7b48bc5d5e8a0916dccdc2b3'
         ],
         description: 'Os jogadores exploram um mundo aberto feito de blocos, podendo construir, minerar e sobreviver. O jogo mistura criatividade, aventura e exploração em diferentes modos de jogo.',
         categories: ['Sandbox', 'Construção', 'Online'],
@@ -49,7 +47,7 @@ const defaultGames = [
     {
         id: 'valorant',
         name: 'Valorant',
-        imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi1Ss8JrF6wtsT3jr3U-TM--1hOujG7LC9Eg&s',
+        imageUrl: 'https://cdn1.epicgames.com/offer/cbd5b3d310a54b12bf3fe8c41994174f/EGS_VALORANT_RiotGames_S2_1200x1600-5b905ef8bbc4437fb4388ba8aa1f958d',
         description: 'Equipes de agentes com habilidades únicas se enfrentam em partidas táticas de tiro 5v5. O jogo combina estratégia, precisão e poderes especiais em combates competitivos intensos.',
         categories: ['FPS', 'Competitivo', 'Online'],
         releaseDate: '2020-06-02',
@@ -70,8 +68,7 @@ const defaultGames = [
         imageUrl: 'https://tm.ibxk.com.br/2022/02/16/16171456629489.jpg',
         gallery: [
             'https://tm.ibxk.com.br/2022/02/16/16171456629489.jpg',
-            'https://cdn.cloudflare.steamstatic.com/steam/apps/381210/header.jpg',
-            'https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/1/10/DbD_Hooker.png'
+            'https://cdn.cloudflare.steamstatic.com/steam/apps/381210/header.jpg'
         ],
         description: 'Quatro sobreviventes tentam escapar de um assassino implacável em partidas de terror multiplayer. Cada jogo mistura estratégia, perseguição e sobrevivência em cenários sombrios.',
         categories: ['Terror', 'Multiplayer', 'Sobrevivência'],
@@ -139,11 +136,13 @@ function removeGameFromStorage(gameId) {
 
 function initializeLibrary() {
     const savedGames = getSavedGames();
+    // Não salvamos os jogos padrão automaticamente — apenas retornamos os jogos salvos pelo usuário.
+    // Isso mantém as abas "Início" e "Jogos" vazias até que o usuário adicione jogos.
     if (!savedGames || savedGames.length === 0) {
-        saveGames(defaultGames);
-        return [...defaultGames];
+        return [];
     }
 
+    // Se houver jogos salvos, tentamos mesclar dados faltantes com as entradas padrão (se houver correspondência por id).
     const defaultMap = new Map(defaultGames.map(game => [game.id, game]));
     let migrated = false;
 
@@ -168,8 +167,70 @@ function initializeLibrary() {
 
 function loadSavedGames() {
     const savedGames = initializeLibrary();
-    savedGames.forEach(game => addGameCard(game, false));
+    gamesContainer.innerHTML = '';
+
+    if (savedGames && savedGames.length) {
+        savedGames.forEach(game => addGameCard(game, false));
+    } else {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.className = 'empty-library-message';
+        emptyMessage.textContent = 'Sua biblioteca está vazia. Vá para a aba "Adicionar" e inclua os jogos que deseja.';
+        gamesContainer.appendChild(emptyMessage);
+    }
+
     renderManageList();
+}
+
+function hideDefaultGamesSection() {
+    // Não há uma seção separada de jogos padrão além da aba Adicionar,
+    // então deixamos esta função como no-op para compatibilidade.
+}
+
+function showDefaultGamesSection() {
+    showAddGameSection();
+}
+
+function renderDefaultGamesInAddSection() {
+    if (!defaultGamesGrid) return;
+    defaultGamesGrid.innerHTML = '';
+
+    const savedIds = new Set(getSavedGames().map(game => game.id));
+
+    defaultGames.forEach(game => {
+        const item = document.createElement('div');
+        item.className = 'default-game-item';
+
+        const card = createGameCard(game);
+        item.appendChild(card);
+
+        const btn = document.createElement('button');
+        btn.className = 'add-default-btn';
+        const isSaved = savedIds.has(game.id);
+        btn.textContent = isSaved ? 'Remover da minha biblioteca' : 'Adicionar à minha biblioteca';
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const saved = getSavedGames();
+            const currentlySaved = saved.some(g => g.id === game.id);
+
+            if (currentlySaved) {
+                removeGameFromStorage(game.id);
+                removeGameCardById(game.id);
+                renderManageList();
+                renderDefaultGamesInAddSection();
+                alert('Jogo removido da sua biblioteca!');
+                return;
+            }
+
+            addGameCard(game, true);
+            renderManageList();
+            renderDefaultGamesInAddSection();
+            alert('Jogo adicionado à sua biblioteca!');
+        });
+
+        item.appendChild(btn);
+        defaultGamesGrid.appendChild(item);
+    });
 }
 
 function getGameCards() {
@@ -288,7 +349,8 @@ function showAddGameSection() {
     if (addGameSection) {
         if (categoriesPanel) categoriesPanel.classList.remove('active');
         if (manageGamesSection) manageGamesSection.style.display = 'none';
-        hideDetailSection();
+        if (gameDetailSection) gameDetailSection.style.display = 'none';
+        if (gamesContainer) gamesContainer.style.display = 'none';
         addGameSection.style.display = 'block';
         addGameSection.scrollIntoView({ behavior: 'smooth' });
     }
@@ -329,12 +391,13 @@ function hideDetailSection() {
 
 function showGameDetail(gameId) {
     if (!detailContent || !gameDetailSection || !gamesContainer) return;
-    const allGames = getSavedGames();
+    const allGames = [...getSavedGames(), ...defaultGames];
     const game = allGames.find(item => item.id === gameId);
     if (!game) return;
 
     if (addGameSection) addGameSection.style.display = 'none';
     if (manageGamesSection) manageGamesSection.style.display = 'none';
+    hideDefaultGamesSection();
     gamesContainer.style.display = 'none';
 
     const minReqList = (game.requirements && Array.isArray(game.requirements.min)) ? game.requirements.min.map(r => `<li>${r}</li>`).join('') : '';
@@ -377,7 +440,8 @@ function showManageGamesSection() {
     if (!manageGamesSection) return;
     if (categoriesPanel) categoriesPanel.classList.remove('active');
     if (addGameSection) addGameSection.style.display = 'none';
-    hideDetailSection();
+    if (gameDetailSection) gameDetailSection.style.display = 'none';
+    if (gamesContainer) gamesContainer.style.display = 'none';
     manageGamesSection.style.display = 'block';
     renderManageList();
     manageGamesSection.scrollIntoView({ behavior: 'smooth' });
@@ -431,6 +495,11 @@ function createGameCard(data) {
 function addGameCard(gameData, save = false) {
     if (!gameData.id) {
         gameData.id = generateId();
+    }
+
+    const existingEmptyMessage = gamesContainer.querySelector('.empty-library-message');
+    if (existingEmptyMessage) {
+        existingEmptyMessage.remove();
     }
 
     const newCard = createGameCard(gameData);
@@ -573,6 +642,7 @@ function renderManageList() {
             removeGameFromStorage(game.id);
             removeGameCardById(game.id);
             renderManageList();
+            renderDefaultGamesInAddSection();
             if (categoriesPanel && categoriesPanel.classList.contains('active')) {
                 buildCategoriesPanel();
             }
@@ -668,11 +738,16 @@ if (addGameForm) {
         const price = parseFloat(priceInput.value);
         const description = descriptionInput.value.trim();
 
+        // Requisitos (mínimos/recomendados) do formulário de adição
+        const minReqInput = document.querySelector('#game-min-req');
+        const recReqInput = document.querySelector('#game-rec-req');
+        const minReq = minReqInput ? minReqInput.value.split('\n').map(s => s.trim()).filter(Boolean) : [];
+        const recReq = recReqInput ? recReqInput.value.split('\n').map(s => s.trim()).filter(Boolean) : [];
+
         if (!name || !imageUrl || !description || categories.length === 0 || !releaseDate || Number.isNaN(price)) {
             alert('Por favor, preencha todos os campos e adicione pelo menos uma categoria.');
             return;
         }
-
         addGameCard({ name, imageUrl, description, categories, releaseDate, price, requirements: { min: minReq, recommended: recReq } }, true);
 
         nameInput.value = '';
@@ -690,6 +765,7 @@ if (addGameForm) {
 
 setupTagFilter();
 loadSavedGames();
+renderDefaultGamesInAddSection();
 loadTheme();
 
 if (themeToggleButton) {
@@ -722,6 +798,38 @@ window.addEventListener('load', () => {
     console.log('Biblioteca carregada com sucesso!');
 });
 
+// API pública para manipular a biblioteca via código
+window.GameLibrary = {
+    add(gameData, save = true) {
+        addGameCard(gameData, save);
+    },
+    getAll() {
+        return getSavedGames();
+    },
+    update(gameData) {
+        updateGameInStorage(gameData);
+        updateSavedCard(gameData);
+    },
+    remove(gameId) {
+        removeGameFromStorage(gameId);
+        removeGameCardById(gameId);
+        renderManageList();
+    },
+    showDetail(gameId) {
+        showGameDetail(gameId);
+    },
+    resetFilters() {
+        resetFilters();
+    },
+    init() {
+        initializeEditForm();
+        setupTagFilter();
+        loadSavedGames();
+        renderDefaultGamesInAddSection();
+        loadTheme();
+    }
+};
+
 /* =========================================
    NAVEGAÇÃO DO HEADER
 ========================================= */
@@ -738,6 +846,10 @@ if (navLinks && navLinks.length) {
                 hideAddGameSection();
                 hideManageGamesSection();
                 hideDetailSection();
+                if (gamesContainer) {
+                    gamesContainer.style.display = '';
+                    gamesContainer.classList.remove('grid-layout');
+                }
                 const banner = document.querySelector('.banner');
                 if (banner) banner.scrollIntoView({ behavior: 'smooth' });
                 else window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -747,8 +859,18 @@ if (navLinks && navLinks.length) {
                 hideAddGameSection();
                 hideManageGamesSection();
                 hideDetailSection();
-                const games = document.querySelector('.games-container');
-                if (games) games.scrollIntoView({ behavior: 'smooth' });
+                if (gamesContainer) {
+                    gamesContainer.style.display = '';
+                    gamesContainer.classList.add('grid-layout');
+                }
+                gamesContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            if (action === 'defaults') {
+                hideAddGameSection();
+                hideManageGamesSection();
+                hideDetailSection();
+                showDefaultGamesSection();
             }
 
             if (action === 'add') {

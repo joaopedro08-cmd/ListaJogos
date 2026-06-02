@@ -39,18 +39,11 @@
 </div>
 
 <section id="add-game-section" class="add-game-section" style="display:none;">
-    <h2>Adicionar Novo Jogo</h2>
-    <form id="add-game-form" class="add-game-form">
-        <input type="text" id="game-name" placeholder="Nome do jogo" required>
-        <input type="url" id="game-image" placeholder="URL da imagem do jogo" required>
-        <input type="text" id="game-categories" placeholder="Categorias (separadas por vírgula)" required>
-        <input type="date" id="game-release-date" placeholder="Data de lançamento" required>
-        <input type="number" id="game-price" placeholder="Preço médio (R$)" step="0.01" min="0" required>
-        <textarea id="game-description" placeholder="Descrição do jogo" required></textarea>
-        <textarea id="game-min-req" placeholder="Requisitos mínimos (cada item em nova linha)"></textarea>
-        <textarea id="game-rec-req" placeholder="Requisitos recomendados (cada item em nova linha)"></textarea>
-        <button type="submit">Adicionar jogo</button>
-    </form>
+    <h2>Adicionar</h2>
+    <div id="default-games-list" class="default-games-list">
+        <h3>Jogos disponíveis</h3>
+        <div id="default-games-grid" class="default-games-grid"></div>
+    </div>
 </section>
 
 <section id="manage-games-section" class="manage-games-section" style="display:none;">

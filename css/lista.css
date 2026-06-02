@@ -354,14 +354,22 @@ body.dark-theme .theme-icon {
 /* GRID */
 
 .games-container {
-    padding: 24px;
+    padding: 16px;
 
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
-
+    justify-content: flex-start;
+    align-items: flex-start;
     gap: 24px;
+    width: 100%;
+}
+
+.games-container.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    justify-content: center;
+    align-items: start;
+    gap: 6px;
 }
 
 /* CARD */
@@ -378,8 +386,12 @@ body.dark-theme .theme-icon {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     cursor: pointer;
 
-    width: 240px;
-    aspect-ratio: 3 / 4; /* orientação vertical tipo folha */
+    width: 100%;
+    max-width: 260px;
+    height: 384px;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
 }
 
 .game-card:hover {
@@ -396,8 +408,55 @@ body.dark-theme .theme-icon {
 }
 
 .game-info {
-    display: none !important;
+    display: none;
 }
+
+.game-info h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.tags span {
+    display: inline-block;
+    background: var(--tag-bg);
+    padding: 6px 8px;
+    border-radius: 6px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+/* Default games grid in Add section */
+.default-games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+    margin-top: 16px;
+}
+
+.default-game-item {
+    width: 100%;
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.add-default-btn {
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    background: var(--button-bg);
+    color: var(--button-text);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.add-default-btn:hover {
+    background: var(--button-hover);
+}
+
 
 /* INFO */
 
